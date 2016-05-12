@@ -19,11 +19,6 @@ public class SampleFXMLApp extends Application {
         System.out.println("Welcome to the TIY TODO App");
 
         launch(args);
-
-        Exception exception = new Exception();
-        exception.printStackTrace();
-        exception.getCause();
-        exception.getMessage();
     }
 
     @Override

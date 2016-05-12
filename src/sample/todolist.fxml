@@ -17,9 +17,9 @@
       </ToolBar>
       <HBox prefHeight="12.0" prefWidth="600.0" VBox.vgrow="NEVER">
          <children>
-            <TextField fx:id="todoText" onAction="#sendMessage" HBox.hgrow="ALWAYS" />
+            <TextField fx:id="todoText" onAction="#addItem" HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
-      <ListView fx:id="todoList" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+      <ListView fx:id="todoList" onMouseClicked="#toggleItem" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
    </children>
 </VBox>
