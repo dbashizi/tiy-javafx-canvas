@@ -86,4 +86,10 @@ public class ToDoDatabaseTest {
         todoDatabase.deleteToDo(conn, firstToDoText);
         todoDatabase.deleteToDo(conn, secondToDoText);
     }
+
+    @Test
+    public void testToggleToDo() throws Exception{
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+
+    }
 }
