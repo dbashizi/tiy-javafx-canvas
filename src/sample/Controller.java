@@ -34,21 +34,21 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        System.out.print("Please enter your name: ");
-        Scanner inputScanner = new Scanner(System.in);
-        username = inputScanner.nextLine();
+     //   System.out.print("Please enter your name: ");
+     //   Scanner inputScanner = new Scanner(System.in);
+    //    username = inputScanner.nextLine();
 
-        if (username != null && !username.isEmpty()) {
-            fileName = username + ".json";
-        }
+    //    if (username != null && !username.isEmpty()) {
+     //       fileName = username + ".json";
+     //   }
 
-        System.out.println("Checking existing list ...");
-        ToDoItemList retrievedList = retrieveList();
-        if (retrievedList != null) {
-            for (ToDoItem item : retrievedList.todoItems) {
-                todoItems.add(item);
-            }
-        }
+    //    System.out.println("Checking existing list ...");
+    //    ToDoItemList retrievedList = retrieveList();
+    //    if (retrievedList != null) {
+    //        for (ToDoItem item : retrievedList.todoItems) {
+    //            todoItems.add(item);
+    //        }
+   //     }
 
         todoList.setItems(todoItems);
     }
