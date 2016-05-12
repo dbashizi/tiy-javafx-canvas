@@ -1,0 +1,3 @@
+2016-05-12 13:40:02 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "TODOS" not found; SQL statement:
+SELECT * FROM todos [42102-191]
