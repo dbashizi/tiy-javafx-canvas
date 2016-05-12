@@ -9,7 +9,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
+import org.h2.tools.Server;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Scanner;
 
 public class SampleFXMLApp extends Application {
@@ -17,7 +22,10 @@ public class SampleFXMLApp extends Application {
     public static void main(String[] args) {
 
         System.out.println("Welcome to the TIY TODO App");
-
+//        Server.createWebServer().start();
+//        Connection conn = DriverManager.getConnection("jdbc:h2:./main"); //create a database connect to the aforementioned JDBC URL:
+//        Statement stmt = conn.createStatement();
+//        stmt.execute("CREATE TABLE IF NOT EXISTS todoitems (text VARCHAR, is_done BOOLEAN)");
         launch(args);
     }
 
@@ -37,7 +45,8 @@ public class SampleFXMLApp extends Application {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
                 System.out.println("Stage is closing -> saving the todo list! ");
-                controller.saveList();
+//                controller.saveList();
+
             }
         });
 
