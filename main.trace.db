@@ -1,0 +1,24 @@
+2016-05-12 12:57:08 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "TODOS" not found; SQL statement:
+SELECT * FROM todos [42102-191]
+2016-05-12 12:59:54 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "TODOS" not found; SQL statement:
+SELECT * FROM todos [42102-191]
+2016-05-12 13:00:01 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "TODOS" not found; SQL statement:
+SELECT * FROM todos [42102-191]
+2016-05-12 13:00:18 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "TODOS" not found; SQL statement:
+SELECT * FROM todos [42102-191]
+2016-05-12 13:00:40 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "TODOS" not found; SQL statement:
+SELECT * FROM TODOS [42102-191]
+2016-05-12 13:01:19 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "TODOS" not found; SQL statement:
+SELECT * FROM TODOS [42102-191]
+2016-05-12 13:01:45 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "TODOS" not found; SQL statement:
+SELECT * FROM TODOS [42102-191]
+2016-05-12 13:02:51 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "TODOS" not found; SQL statement:
+SELECT * FROM TODOS [42102-191]
