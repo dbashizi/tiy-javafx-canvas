@@ -1,0 +1,6 @@
+2016-05-12 13:56:42 jdbc[3]: exception
+org.h2.jdbc.JdbcSQLException: Table "TODOS" not found; SQL statement:
+SELECT * FROM todos [42102-191]
+2016-05-12 16:28:19 jdbc[4]: exception
+org.h2.jdbc.JdbcSQLException: Data conversion error converting "UnitTest-ToDo"; SQL statement:
+SELECT * FROM todos where text = ? [22018-191]
