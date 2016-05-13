@@ -13,8 +13,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
@@ -29,10 +32,29 @@ public class Controller implements Initializable {
     ArrayList<ToDoItem> savableList = new ArrayList<ToDoItem>();
     String fileName = "todos.json";
 
+    ToDoDatabase toDoDatabase = new ToDoDatabase();
+
+
     public String username;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+            toDoDatabase.init();
+
+            System.out.println("Checking existing list ...");
+            ArrayList<ToDoItem> todos = toDoDatabase.selectToDos(conn);
+                for (ToDoItem item : todos) {
+                    todoItems.add(item);
+                }
+            todoList.setItems(todoItems);
+        } catch (SQLException e) {
+
+        }
+    }
+
+    public void startWithUserName() {
 
         System.out.print("Please enter your name: ");
         Scanner inputScanner = new Scanner(System.in);
@@ -43,13 +65,12 @@ public class Controller implements Initializable {
         }
 
         System.out.println("Checking existing list ...");
-        ToDoItemList retrievedList = retrieveList();
+        ToDoItemList retrievedList = retrieveJsonList();
         if (retrievedList != null) {
             for (ToDoItem item : retrievedList.todoItems) {
                 todoItems.add(item);
             }
         }
-
         todoList.setItems(todoItems);
     }
 
@@ -58,35 +79,58 @@ public class Controller implements Initializable {
             System.out.println("Saving " + todoItems.size() + " items in the list");
             savableList = new ArrayList<ToDoItem>(todoItems);
             System.out.println("There are " + savableList.size() + " items in my savable list");
-            saveList();
+            saveListToJson();
         } else {
             System.out.println("No items in the ToDo List");
         }
     }
 
     public void addItem() {
-        System.out.println("Adding item ...");
-        todoItems.add(new ToDoItem(todoText.getText()));
-        todoText.setText("");
-    }
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+            System.out.println("Adding item ...");
+            todoItems.add(new ToDoItem(todoText.getText()));
+            String randomString = "random";
+            toDoDatabase.insertToDo(conn, todoText.getText());
+            todoText.setText("");
+        } catch(SQLException e){
 
-    public void removeItem() {
-        ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
-        System.out.println("Removing " + todoItem.text + " ...");
-        todoItems.remove(todoItem);
-    }
-
-    public void toggleItem() {
-        System.out.println("Toggling item ...");
-        ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
-        if (todoItem != null) {
-            todoItem.isDone = !todoItem.isDone;
-            todoList.setItems(null);
-            todoList.setItems(todoItems);
         }
     }
 
-    public void saveList() {
+    public void removeItem() {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+            ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
+            System.out.println("Removing " + todoItem.text + " ...");
+            toDoDatabase.deleteToDo(conn, todoItem.text);
+            todoItems.remove(todoItem);
+        }catch (SQLException e) {
+
+        }
+    }
+
+    public void toggleItem() {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+
+            System.out.println("Toggling item ...");
+            int selectedItemIndex = todoList.getSelectionModel().getSelectedIndex();
+            ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
+            if (todoItem != null) {
+                toDoDatabase.toggleToDo(conn, todoItem.id);
+                todoItem.isDone = !todoItem.isDone;
+                todoList.setItems(null);
+                todoList.setItems(todoItems);
+            }
+            todoList.getSelectionModel().select(selectedItemIndex);
+
+        } catch(SQLException e) {
+
+        }
+    }
+
+    public void saveListToJson() {
         try {
 
             // write JSON
@@ -105,7 +149,7 @@ public class Controller implements Initializable {
         }
     }
 
-    public ToDoItemList retrieveList() {
+    public ToDoItemList retrieveJsonList() {
         try {
 
             Scanner fileScanner = new Scanner(new File(fileName));
