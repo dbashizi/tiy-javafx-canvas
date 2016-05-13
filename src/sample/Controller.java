@@ -115,6 +115,7 @@ public class Controller implements Initializable {
             Connection conn = DriverManager.getConnection("jdbc:h2:./main");
 
             System.out.println("Toggling item ...");
+            int selectedItemIndex = todoList.getSelectionModel().getSelectedIndex();
             ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
             if (todoItem != null) {
                 toDoDatabase.toggleToDo(conn, todoItem.id);
@@ -122,6 +123,8 @@ public class Controller implements Initializable {
                 todoList.setItems(null);
                 todoList.setItems(todoItems);
             }
+            todoList.getSelectionModel().select(selectedItemIndex);
+
         } catch(SQLException e) {
 
         }
