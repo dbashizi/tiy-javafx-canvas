@@ -18,6 +18,7 @@ public class ToDoDatabase {
         Connection conn = DriverManager.getConnection(DB_URL);
         Statement stmt = conn.createStatement();
         stmt.execute("CREATE TABLE IF NOT EXISTS todos (id IDENTITY, text VARCHAR, is_done BOOLEAN)");
+        //return conn;
     }
 
         // this method will insert a single ToDo item
