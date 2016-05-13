@@ -45,4 +45,10 @@ public class ToDoDatabase {
         return items;
     }
 
+    public static void toggleToDo(Connection conn, int id) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("UPDATE todos SET is_done = NOT is_done WHERE id = ?");
+        stmt.setInt(1, id);
+        stmt.execute();
+    }
+
 }

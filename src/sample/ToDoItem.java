@@ -8,10 +8,15 @@ public class ToDoItem {
     public boolean isDone;
     public int id;
 
+    public ToDoItem(String text) {
+        this.text = text;
+        this.isDone = false;
+    }
+
     public ToDoItem(int id, String text, boolean isDone) {
-        this.id = id;
         this.text = text;
         this.isDone = isDone;
+        this.id = id;
     }
 
     public ToDoItem() {

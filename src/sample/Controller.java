@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.PreparedStatement;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ResourceBundle;
@@ -34,21 +35,21 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        System.out.print("Please enter your name: ");
-        Scanner inputScanner = new Scanner(System.in);
-        username = inputScanner.nextLine();
-
-        if (username != null && !username.isEmpty()) {
-            fileName = username + ".json";
-        }
-
-        System.out.println("Checking existing list ...");
-        ToDoItemList retrievedList = retrieveList();
-        if (retrievedList != null) {
-            for (ToDoItem item : retrievedList.todoItems) {
-                todoItems.add(item);
-            }
-        }
+//        System.out.print("Please enter your name: ");
+//        Scanner inputScanner = new Scanner(System.in);
+//        username = inputScanner.nextLine();
+//
+//        if (username != null && !username.isEmpty()) {
+//            fileName = username + ".json";
+//        }
+//
+//        System.out.println("Checking existing list ...");
+//        ToDoItemList retrievedList = retrieveList();
+//        if (retrievedList != null) {
+//            for (ToDoItem item : retrievedList.todoItems) {
+//                todoItems.add(item);
+//            }
+//        }
 
         todoList.setItems(todoItems);
     }
@@ -58,7 +59,8 @@ public class Controller implements Initializable {
             System.out.println("Saving " + todoItems.size() + " items in the list");
             savableList = new ArrayList<ToDoItem>(todoItems);
             System.out.println("There are " + savableList.size() + " items in my savable list");
-            saveList();
+            //saveList();
+            //add code to insert into database here!
         } else {
             System.out.println("No items in the ToDo List");
         }

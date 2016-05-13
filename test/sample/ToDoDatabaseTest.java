@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.util.ArrayList;
 
 import static org.junit.Assert.*;
 
@@ -69,5 +70,42 @@ public class ToDoDatabaseTest {
         PreparedStatement todoQuery = conn.prepareStatement("SELECT * FROM todos");
         ResultSet results = todoQuery.executeQuery();
         assertNotNull(results);
+    }
+
+    @Test
+    public void testSelectAllToDos() throws Exception {
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+        String firstToDoText = "UnitTest-ToDo1";
+        String secondToDoText = "UnitTest-ToDo2";
+
+        todoDatabase.insertToDo(conn, firstToDoText);
+        todoDatabase.insertToDo(conn, secondToDoText);
+
+        ArrayList<ToDoItem> todos = todoDatabase.selectToDos(conn);
+        System.out.println("Found " + todos.size() + " todos in the database");
+
+        assertTrue("There should be at least 2 todos in the database (there are " +
+                todos.size() + ")", todos.size() > 1);
+
+        todoDatabase.deleteToDo(conn, firstToDoText);
+        todoDatabase.deleteToDo(conn, secondToDoText);
+    }
+
+    @Test
+    public void testToggleToDo() throws Exception {
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+        String todoText = "Test the toggle method";
+        todoDatabase.insertToDo(conn, todoText);
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos WHERE text= ?");
+        stmt.setString(1, todoText);
+        ResultSet results = stmt.executeQuery();
+        results.next();
+        boolean beforeToggleModel = results.getBoolean("is_done");
+        todoDatabase.toggleToDo(conn, results.getInt("id"));
+        results = stmt.executeQuery(); //this and the following line pull up our new, updated results!
+        results.next(); //loads in our results, updated from the toggle!
+        boolean afterToggleModel = results.getBoolean("is_done");
+        assertNotEquals(beforeToggleModel, afterToggleModel);
+
     }
 }
