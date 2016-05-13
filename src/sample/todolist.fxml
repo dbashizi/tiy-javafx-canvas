@@ -12,7 +12,7 @@
    <children>
       <ToolBar prefHeight="40.0" prefWidth="200.0">
         <items>
-          <Button mnemonicParsing="false" onAction="#saveToDoList" text="Save ToDos" />
+          <Button mnemonicParsing="false" onAction="#saveToDoList" text="Save Local File" />
             <Button mnemonicParsing="false" onAction="#removeItem" text="Delete" />
         </items>
       </ToolBar>

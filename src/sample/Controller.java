@@ -79,7 +79,7 @@ public class Controller implements Initializable {
             System.out.println("Saving " + todoItems.size() + " items in the list");
             savableList = new ArrayList<ToDoItem>(todoItems);
             System.out.println("There are " + savableList.size() + " items in my savable list");
-            saveList();
+            saveListToJson();
         } else {
             System.out.println("No items in the ToDo List");
         }
@@ -127,7 +127,7 @@ public class Controller implements Initializable {
         }
     }
 
-    public void saveList() {
+    public void saveListToJson() {
         try {
 
             // write JSON

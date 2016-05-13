@@ -37,7 +37,8 @@ public class SampleFXMLApp extends Application {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             public void handle(WindowEvent we) {
 //                System.out.println("Stage is closing -> saving the todo list! ");
-//                controller.saveList();
+//                controller.saveListToJson();
+
                 System.out.println("Stage is closing! ");
 
             }
