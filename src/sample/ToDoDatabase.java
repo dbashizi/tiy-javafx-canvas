@@ -26,6 +26,13 @@ public class ToDoDatabase {
         stmt.execute();
     }
 
+    public void insertToDo(String text) throws SQLException {
+        Connection conn = DriverManager.getConnection(DB_URL);
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO todos VALUES (NULL, ?, false)");
+        stmt.setString(1, text);
+        stmt.execute();
+    }
+
     public void deleteToDo(Connection conn, String text) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement("DELETE FROM todos where text = ?");
         stmt.setString(1, text);
@@ -33,6 +40,20 @@ public class ToDoDatabase {
     }
 
     public static ArrayList<ToDoItem> selectToDos(Connection conn) throws SQLException {
+        ArrayList<ToDoItem> items = new ArrayList<>();
+        Statement stmt = conn.createStatement();
+        ResultSet results = stmt.executeQuery("SELECT * FROM todos");
+        while (results.next()) {
+            int id = results.getInt("id");
+            String text = results.getString("text");
+            boolean isDone = results.getBoolean("is_done");
+            items.add(new ToDoItem(id, text, isDone));
+        }
+        return items;
+    }
+
+    public static ArrayList<ToDoItem> selectToDos() throws SQLException {
+        Connection conn = DriverManager.getConnection(DB_URL);
         ArrayList<ToDoItem> items = new ArrayList<>();
         Statement stmt = conn.createStatement();
         ResultSet results = stmt.executeQuery("SELECT * FROM todos");

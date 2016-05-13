@@ -13,7 +13,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ResourceBundle;
@@ -32,9 +35,11 @@ public class Controller implements Initializable {
 
     public String username;
 
+    ToDoDatabase toDoDatabase = new ToDoDatabase();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-
+//        savableList.addAll()
 //        System.out.print("Please enter your name: ");
 //        Scanner inputScanner = new Scanner(System.in);
 //        username = inputScanner.nextLine();
@@ -51,7 +56,20 @@ public class Controller implements Initializable {
 //            }
 //        }
 
-        todoList.setItems(todoItems);
+        try {
+            Connection conn;
+            conn = DriverManager.getConnection("jdbc:h2:./main");
+            toDoDatabase.init();
+
+            System.out.println("Checking existing list ...");
+            ArrayList<ToDoItem> todos = toDoDatabase.selectToDos(conn);
+            for (ToDoItem item : todos) {
+                todoItems.add(item);
+            }
+            todoList.setItems(todoItems);
+        } catch (SQLException e) {
+
+        }
     }
 
     public void saveToDoList() {
@@ -61,30 +79,70 @@ public class Controller implements Initializable {
             System.out.println("There are " + savableList.size() + " items in my savable list");
             //saveList();
             //add code to insert into database here!
+
         } else {
             System.out.println("No items in the ToDo List");
         }
     }
 
-    public void addItem() {
-        System.out.println("Adding item ...");
-        todoItems.add(new ToDoItem(todoText.getText()));
-        todoText.setText("");
+//    public void addItem() {
+//        System.out.println("Adding item ...");
+//        todoItems.add(new ToDoItem(todoText.getText()));
+//        todoText.setText("");
+//
+//        try {
+//            new ToDoDatabase().insertToDo(todoText.getText());
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    public void addItem() { //From Aaron
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+            System.out.println("Adding item ...");
+            todoItems.add(new ToDoItem(todoText.getText()));
+            String randomString = "random";
+            toDoDatabase.insertToDo(conn, todoText.getText());
+            todoText.setText("");
+        } catch(SQLException e){
+
+        }
     }
 
-    public void removeItem() {
-        ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
-        System.out.println("Removing " + todoItem.text + " ...");
-        todoItems.remove(todoItem);
+//    public void removeItem() {
+//        ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
+//        System.out.println("Removing " + todoItem.text + " ...");
+//        todoItems.remove(todoItem);
+//    }
+
+    public void removeItem() { //From Aaron
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+            ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
+            System.out.println("Removing " + todoItem.text + " ...");
+            toDoDatabase.deleteToDo(conn, todoItem.text);
+            todoItems.remove(todoItem);
+        }catch (SQLException e) {
+
+        }
     }
 
     public void toggleItem() {
-        System.out.println("Toggling item ...");
-        ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
-        if (todoItem != null) {
-            todoItem.isDone = !todoItem.isDone;
-            todoList.setItems(null);
-            todoList.setItems(todoItems);
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+            int selectedItemIndex = todoList.getSelectionModel().getSelectedIndex();
+            ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
+            if (todoItem != null) {
+                toDoDatabase.toggleToDo(conn, todoItem.id);
+                todoItem.isDone = !todoItem.isDone;
+                todoList.setItems(null);
+                todoList.setItems(todoItems);
+            }
+            todoList.getSelectionModel().select(selectedItemIndex);
+
+        } catch(SQLException e) {
+
         }
     }
 

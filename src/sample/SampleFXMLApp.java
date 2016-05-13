@@ -1,6 +1,5 @@
-package sample;/**
- * Created by Dominique on 4/21/2016.
- */
+package sample;
+
 
 import javafx.application.Application;
 import javafx.event.EventHandler;
@@ -38,6 +37,7 @@ public class SampleFXMLApp extends Application {
             public void handle(WindowEvent we) {
                 System.out.println("Stage is closing -> saving the todo list! ");
                 controller.saveList();
+                System.exit(0);
             }
         });
 
