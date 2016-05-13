@@ -49,5 +49,4 @@ public class ToDoDatabase {
         stmt.setInt(1, id);
         stmt.execute();
     }
-
 }

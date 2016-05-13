@@ -13,8 +13,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.ResourceBundle;
 import java.util.Scanner;
 
@@ -27,6 +29,7 @@ public class Controller implements Initializable {
 
     ObservableList<ToDoItem> todoItems = FXCollections.observableArrayList();
     ArrayList<ToDoItem> savableList = new ArrayList<ToDoItem>();
+    ToDoDatabase toDoDatabase = new ToDoDatabase();
     String fileName = "todos.json";
 
     public String username;
@@ -34,23 +37,36 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
-        System.out.print("Please enter your name: ");
-        Scanner inputScanner = new Scanner(System.in);
-        username = inputScanner.nextLine();
+//        System.out.print("Please enter your name: ");
+//        Scanner inputScanner = new Scanner(System.in);
+//        username = inputScanner.nextLine();
 
-        if (username != null && !username.isEmpty()) {
-            fileName = username + ".json";
-        }
+//        if (username != null && !username.isEmpty()) {
+//            fileName = username + ".json";
+//        }
+//
+//        System.out.println("Checking existing list ...");
+//        ToDoItemList retrievedList = retrieveList();
+//        if (retrievedList != null) {
+//            for (ToDoItem item : retrievedList.todoItems) {
+//                todoItems.add(item);
+//            }
+//        }
+//
+//        todoList.setItems(todoItems);
 
-        System.out.println("Checking existing list ...");
-        ToDoItemList retrievedList = retrieveList();
-        if (retrievedList != null) {
-            for (ToDoItem item : retrievedList.todoItems) {
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+            ArrayList<ToDoItem> todos = toDoDatabase.selectToDos(conn);
+            System.out.println("Retrieving toDoItem List ...");
+            ToDoItemList retrievedList = retrieveList();
+            for (ToDoItem item : todos) {
                 todoItems.add(item);
             }
+            todoList.setItems(todoItems);
+        } catch (SQLException exception) {
+            exception.printStackTrace();
         }
-
-        todoList.setItems(todoItems);
     }
 
     public void saveToDoList() {
@@ -65,9 +81,19 @@ public class Controller implements Initializable {
     }
 
     public void addItem() {
+        try {
         System.out.println("Adding item ...");
+        Connection conn =  DriverManager.getConnection("jdbc:h2:./main");
+        toDoDatabase.insertToDo(conn, todoText.getText());
         todoItems.add(new ToDoItem(todoText.getText()));
         todoText.setText("");
+
+
+
+
+        } catch (SQLException exception) {
+
+        }
     }
 
     public void removeItem() {
@@ -79,11 +105,20 @@ public class Controller implements Initializable {
     public void toggleItem() {
         System.out.println("Toggling item ...");
         ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
-        if (todoItem != null) {
-            todoItem.isDone = !todoItem.isDone;
-            todoList.setItems(null);
-            todoList.setItems(todoItems);
+        try {
+            if (todoItem != null) {
+                todoItem.isDone = !todoItem.isDone;
+                todoList.setItems(null);
+                todoList.setItems(todoItems);
+
+                Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+                toDoDatabase.toggleToDo(conn, todoItem.id);
+
+            }
+        } catch (SQLException exception) {
+
         }
+
     }
 
     public void saveList() {
@@ -122,6 +157,20 @@ public class Controller implements Initializable {
             // if we can't find the file or run into an issue restoring the object
             // from the file, just return null, so the caller knows to create an object from scratch
             return null;
+        }
+    }
+
+    public void deleteToDo() {
+        try {
+            ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
+            System.out.println("Deleting item " + todoItem.text + "...");
+            todoItems.remove(todoItem);
+
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+            toDoDatabase.deleteToDo(conn,todoItem.text);
+
+        } catch (SQLException sqlexception) {
+
         }
     }
     
