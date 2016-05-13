@@ -47,7 +47,7 @@ public class ToDoDatabaseTest {
 
         Connection conn = DriverManager.getConnection("jdbc:h2:./main");
         // test if we can insert items into the database
-        String todoText = "UnitTest-ToDo";
+        String todoText = "UnitTest-ToDoxxx";
         todoDatabase.insertToDo(conn, todoText);
         // make sure we can retrieve the todo we just created
         PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos where text = ?");
@@ -105,47 +105,23 @@ public class ToDoDatabaseTest {
 
     @Test
     public void testToggleToDo() throws Exception {
-
         Connection conn = DriverManager.getConnection("jdbc:h2:./main");
-
-        // test if we can insert items into the database
         String todoText = "UnitTest-ToDo";
         todoDatabase.insertToDo(conn, todoText);
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos WHERE text= 'UnitTest-ToDo'");
+        ResultSet results = stmt.executeQuery();
+        results.next();
+        System.out.println("is_done:" + results.getString("is_done"));
+        todoDatabase.toggleToDo(conn,results.getInt("id"));
+        System.out.println("is_done:" + results.getString("is_done"));
+        boolean expectedValue = !results.getBoolean("is_done");
+        assertNotEquals(expectedValue, results.getBoolean("is_done"));
 
-        //
-
-//        // make sure we can retrieve the todo we just created
-//        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos where text = ?");
-//        stmt.setString(1, todoText);
-//        ResultSet results = stmt.executeQuery();
-//        assertNotNull(results);
-//        // count the records in results to make sure we get what we expected
-//        int numResults = 0;
-//        while (results.next()) {
-//            numResults++;
-//            int todosID = results.getInt("id");
-//            String todosText = results.getString("text");
-//            boolean todosisdone = results.getBoolean("is_done");
-//            System.out.println(todosID + "::" + todosText + "->" + todosisdone);
-//            //todoDatabase.toggleToDo(conn, todosID);
-//            //System.out.println("second print" + todosID + "::" + todosText + "->" + todosisdone);
-//        }
-
-        //assertEquals(true, numResults);
-
-//        todoDatabase.deleteToDo(conn, todoText);
+//        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
 //
-//        // make sure there are no more records for our test todo
-//        results = stmt.executeQuery();
-//        numResults = 0;
-//        while (results.next()) {
-//            numResults++;
-//            String todosID = results.getString("id");
-//            String todosText = results.getString("text");
-//            boolean todosIsDone = results.getBoolean("is_done");
-//            System.out.println(todosID + "::" + todosText + "->" + todosIsDone);
-//
-//        }
-//        assertEquals(0, numResults);
+//        // test if we can insert items into the database
+//        String todoText = "UnitTest-ToDo";
+//        todoDatabase.insertToDo(conn, todoText);
+
     }
 }

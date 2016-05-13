@@ -99,18 +99,31 @@ public class Controller implements Initializable {
     }
 
     public void removeItem() {
-        ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
-        System.out.println("Removing " + todoItem.text + " ...");
-        todoItems.remove(todoItem);
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+            ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
+            System.out.println("Removing " + todoItem.text + " ...");
+            toDoDatabase.deleteToDo(conn, todoItem.text);
+            todoItems.remove(todoItem);
+        }catch (SQLException e) {
+
+        }
     }
 
     public void toggleItem() {
-        System.out.println("Toggling item ...");
-        ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
-        if (todoItem != null) {
-            todoItem.isDone = !todoItem.isDone;
-            todoList.setItems(null);
-            todoList.setItems(todoItems);
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+
+            System.out.println("Toggling item ...");
+            ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
+            if (todoItem != null) {
+                toDoDatabase.toggleToDo(conn, todoItem.id);
+                todoItem.isDone = !todoItem.isDone;
+                todoList.setItems(null);
+                todoList.setItems(todoItems);
+            }
+        } catch(SQLException e) {
+
         }
     }
 
