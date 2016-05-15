@@ -13,10 +13,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
 import java.util.Scanner;
@@ -32,7 +29,7 @@ public class Controller implements Initializable {
     ArrayList<ToDoItem> savableList = new ArrayList<ToDoItem>();
     String fileName = "todos.json";
 
-    ToDoDatabase toDoDatabase = new ToDoDatabase();
+    ToDoDatabase toDoDatabase;
 
 
     public String username;
@@ -40,6 +37,7 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         try {
+            toDoDatabase = new ToDoDatabase();
             Connection conn = DriverManager.getConnection("jdbc:h2:./main");
             toDoDatabase.init();
 
@@ -90,7 +88,6 @@ public class Controller implements Initializable {
             Connection conn = DriverManager.getConnection("jdbc:h2:./main");
             System.out.println("Adding item ...");
             todoItems.add(new ToDoItem(todoText.getText()));
-            String randomString = "random";
             toDoDatabase.insertToDo(conn, todoText.getText());
             todoText.setText("");
         } catch(SQLException e){
@@ -102,8 +99,11 @@ public class Controller implements Initializable {
         try {
             Connection conn = DriverManager.getConnection("jdbc:h2:./main");
             ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
+            int selectedItemIndex = todoList.getSelectionModel().getSelectedIndex();
+            ToDoItem id = toDoDatabase.selectToDos(conn).get(selectedItemIndex);
             System.out.println("Removing " + todoItem.text + " ...");
-            toDoDatabase.deleteToDo(conn, todoItem.text);
+            toDoDatabase.deleteToDoByID(conn, id.id);
+//            toDoDatabase.deleteToDo(conn, todoItem.text);
             todoItems.remove(todoItem);
         }catch (SQLException e) {
 
@@ -117,9 +117,11 @@ public class Controller implements Initializable {
             System.out.println("Toggling item ...");
             int selectedItemIndex = todoList.getSelectionModel().getSelectedIndex();
             ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
+            ToDoItem id = toDoDatabase.selectToDos(conn).get(selectedItemIndex);
+
             if (todoItem != null) {
-                toDoDatabase.toggleToDo(conn, todoItem.id);
                 todoItem.isDone = !todoItem.isDone;
+                toDoDatabase.toggleToDo(conn, id.id);
                 todoList.setItems(null);
                 todoList.setItems(todoItems);
             }
