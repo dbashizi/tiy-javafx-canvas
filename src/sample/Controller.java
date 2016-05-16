@@ -13,10 +13,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ResourceBundle;
@@ -32,8 +29,6 @@ public class Controller implements Initializable {
     ObservableList<ToDoItem> todoItems = FXCollections.observableArrayList();
     ArrayList<ToDoItem> savableList = new ArrayList<ToDoItem>();
     String fileName = "todos.json";
-
-    public String username;
 
     ToDoDatabase toDoDatabase = new ToDoDatabase();
 
@@ -85,29 +80,14 @@ public class Controller implements Initializable {
         }
     }
 
-//    public void addItem() {
-//        System.out.println("Adding item ...");
-//        todoItems.add(new ToDoItem(todoText.getText()));
-//        todoText.setText("");
-//
-//        try {
-//            new ToDoDatabase().insertToDo(todoText.getText());
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    public void addItem() { //From Aaron
+    public void addItem() {
         try {
             Connection conn = DriverManager.getConnection("jdbc:h2:./main");
             System.out.println("Adding item ...");
             todoItems.add(new ToDoItem(todoText.getText()));
-            String randomString = "random";
             toDoDatabase.insertToDo(conn, todoText.getText());
             todoText.setText("");
-        } catch(SQLException e){
-
-        }
+        } catch(SQLException e){ }
     }
 
 //    public void removeItem() {
@@ -116,7 +96,7 @@ public class Controller implements Initializable {
 //        todoItems.remove(todoItem);
 //    }
 
-    public void removeItem() { //From Aaron
+    public void removeItem() {
         try {
             Connection conn = DriverManager.getConnection("jdbc:h2:./main");
             ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
@@ -131,15 +111,20 @@ public class Controller implements Initializable {
     public void toggleItem() {
         try {
             Connection conn = DriverManager.getConnection("jdbc:h2:./main");
-            int selectedItemIndex = todoList.getSelectionModel().getSelectedIndex();
+//            int selectedItemIndex = todoList.getSelectionModel().getSelectedIndex();
             ToDoItem todoItem = (ToDoItem) todoList.getSelectionModel().getSelectedItem();
+            String text = todoItem.text;
+            PreparedStatement statement = conn.prepareStatement("SELECT * FROM todos WHERE text= '?' ");
+            statement.setString(1, text);
+            ResultSet result = statement.executeQuery();
             if (todoItem != null) {
-                toDoDatabase.toggleToDo(conn, todoItem.id);
+                result.next();
+                toDoDatabase.toggleToDo(conn, result.getInt("id"));
                 todoItem.isDone = !todoItem.isDone;
                 todoList.setItems(null);
                 todoList.setItems(todoItems);
             }
-            todoList.getSelectionModel().select(selectedItemIndex);
+//            todoList.getSelectionModel().select(selectedItemIndex);
 
         } catch(SQLException e) {
 
