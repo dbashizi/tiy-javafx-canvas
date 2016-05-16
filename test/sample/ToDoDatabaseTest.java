@@ -68,7 +68,17 @@ public class ToDoDatabaseTest {
         }
         assertEquals(0, numResults);
     }
+
+    @Test
+    public void deleteToDo() throws Exception {
+
     }
+
+    @Test
+    public void selectToDos() throws Exception {
+
+    }
+}
 
 
 

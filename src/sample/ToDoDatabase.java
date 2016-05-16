@@ -26,6 +26,12 @@ public class ToDoDatabase {
         stmt.execute();
     }
 
+    public void deleteToDoId(Connection conn, int id) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("DELETE FROM todos where id = ?");
+        stmt.setInt(1, id);
+        stmt.execute();
+    }
+
     public void deleteToDo(Connection conn, String text) throws SQLException {
         PreparedStatement stmt = conn.prepareStatement("DELETE FROM todos where text = ?");
         stmt.setString(1, text);
