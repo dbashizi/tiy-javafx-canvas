@@ -158,7 +158,7 @@ public class SampleApplication extends Application {
         scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
         grid.add(scenetitle, 0, 0, 2, 1);
 
-        Label userName = new Label("User Name:");
+        Label userName = new Label("DataUser Name:");
         grid.add(userName, 0, 1);
 
         TextField userTextField = new TextField();
