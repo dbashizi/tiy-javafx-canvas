@@ -45,7 +45,12 @@ public class ControllerTest {
 
         Connection conn = DriverManager.getConnection("jdbc:h2:./main");
         String todoText = "UnitTest-ToDo";
-        todoDatabase.insertToDo(conn, todoText);
+        // adding a call to insertUser, so we have a user to add todos for
+        String username = "unittester@tiy.com";
+        String fullName = "Unit Tester";
+        int userID = todoDatabase.insertUser(conn, username, fullName);
+
+        todoDatabase.insertToDo(conn, todoText, userID);
         PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos WHERE text= 'UnitTest-ToDo'");
         ResultSet results = stmt.executeQuery();
         results.next();

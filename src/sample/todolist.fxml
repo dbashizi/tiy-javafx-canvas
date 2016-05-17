@@ -16,11 +16,8 @@
             <Button mnemonicParsing="false" onAction="#removeItem" text="Remove" />
         </items>
       </ToolBar>
-      <HBox prefHeight="12.0" prefWidth="600.0" VBox.vgrow="NEVER">
-         <children>
-            <TextField fx:id="todoText" onAction="#addItem" HBox.hgrow="ALWAYS" />
-         </children>
-      </HBox>
-      <ListView fx:id="todoList" onMouseClicked="#toggleItem" prefHeight="200.0" prefWidth="200.0" VBox.vgrow="ALWAYS" />
+      <HBox prefHeight="12.0" prefWidth="600.0" VBox.vgrow="NEVER" />
+       <TextField fx:id="todoText" onAction="#addItem" />
+      <ListView fx:id="todoList" onMouseClicked="#toggleItem" prefHeight="141.0" prefWidth="600.0" VBox.vgrow="ALWAYS" />
    </children>
 </VBox>

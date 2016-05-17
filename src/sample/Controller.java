@@ -14,6 +14,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.Connection;
+import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -37,6 +38,7 @@ public class Controller implements Initializable {
 
     public String username;
     int selectedItemIndex = -1;
+    int userID;
 
     public void setSelectedItemIndex(int selectedItemIndex) {
         this.selectedItemIndex = selectedItemIndex;
@@ -44,12 +46,64 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        startWithUserName();
+    }
+
+    public void startWithUserName() {
+        try {
+            toDoDatabase = new ToDoDatabase();
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+            toDoDatabase.init();
+
+            System.out.println("startWithUserName()");
+            System.out.println("");
+            System.out.print("New User or Existing User: ");
+            Scanner userScanner = new Scanner(System.in);
+            String userResponse = userScanner.nextLine();
+
+            if (userResponse.equalsIgnoreCase("existing user")) {
+                System.out.print("Enter email address: ");
+                String username = userScanner.nextLine();
+                userID = toDoDatabase.selectUser(conn, username).id;
+
+                System.out.println("CHecking existing list ..");
+                ArrayList<ToDoItem> todos = toDoDatabase.selectToDosForUser(conn, userID);
+                for (ToDoItem item : todos) {
+                    todoItems.add(item);
+                }
+                if (todoList != null) {
+                    todoList.setItems(todoItems);
+                }
+            } else if (userResponse.equalsIgnoreCase("new user")) {
+                System.out.println("");
+                System.out.println("Welcome New User !!");
+                System.out.print(" Enter Email Address ::");
+                String username = userScanner.nextLine();
+                System.out.print("Enter First and Last Name ::");
+                String fullname = userScanner.nextLine();
+                userID = toDoDatabase.insertUser(conn, username, fullname);
+
+                System.out.println("Adding User list ..");
+                ArrayList<ToDoItem> todos = toDoDatabase.selectToDosForUser(conn, userID);
+                for (ToDoItem item : todos) {
+                    todoItems.add(item);
+                }
+                if (todoList != null) {
+                    todoList.setItems(todoItems);
+                }
+            } else {
+                System.out.println("ERROR 404 ::");
+            }
+        } catch (SQLException e) {
+        }
+    }
+    public void startWithDatabase(){
         try {
             toDoDatabase = new ToDoDatabase();
             Connection conn = DriverManager.getConnection("jdbc:h2:./main");
             toDoDatabase.init();
             ArrayList<ToDoItem> todos = toDoDatabase.selectToDos(conn);
-             for (ToDoItem item : todos) {
+            for (ToDoItem item : todos) {
                 todoItems.add(item);
             }
             if (todoList != null) {
@@ -57,24 +111,27 @@ public class Controller implements Initializable {
             }
         } catch (SQLException exception) {
 
-
-            //   System.out.print("Please enter your name: ");
-            //   Scanner inputScanner = new Scanner(System.in);
-            //    username = inputScanner.nextLine();
-
-            //    if (username != null && !username.isEmpty()) {
-            //       fileName = username + ".json";
-            //   }
-
-            //    System.out.println("Checking existing list ...");
-            //    ToDoItemList retrievedList = retrieveList();
-            //    if (retrievedList != null) {
-            //        for (ToDoItem item : retrievedList.todoItems) {
-            //            todoItems.add(item);
-            //        }
-            //     }
         }
     }
+
+public void startWithUserNameToJson() {
+               System.out.print("Please enter your name: ");
+               Scanner inputScanner = new Scanner(System.in);
+                username = inputScanner.nextLine();
+
+                if (username != null && !username.isEmpty()) {
+                   fileName = username + ".json";
+               }
+
+                System.out.println("Checking existing list ...");
+                ToDoItemList retrievedList = retrieveList();
+                if (retrievedList != null) {
+                    for (ToDoItem item : retrievedList.todoItems) {
+                        todoItems.add(item);
+                    }
+                }
+        }
+
 
     public void saveToDoList() {
         if (todoItems != null && todoItems.size() > 0) {
@@ -89,9 +146,16 @@ public class Controller implements Initializable {
     }
 
     public void addItem() {
-        System.out.println("Adding item ...");
-        todoItems.add(new ToDoItem(todoText.getText()));
-        todoText.setText("");
+        try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+
+            System.out.println("Adding item ...");
+            todoItems.add(new ToDoItem(todoText.getText()));
+            toDoDatabase.insertToDo(conn, todoText.getText(), userID);
+            todoText.setText("");
+        } catch (SQLException e) {
+
+        }
     }
 
     public void removeItem() {
