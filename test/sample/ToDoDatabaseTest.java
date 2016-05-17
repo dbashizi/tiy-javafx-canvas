@@ -28,7 +28,9 @@ public class ToDoDatabaseTest {
 
     @After
     public void tearDown() throws Exception {
-
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+        todoDatabase.deleteAllToDo(conn);
+        todoDatabase.deleteAllUsers(conn);
     }
 
     @Test
@@ -84,6 +86,45 @@ public class ToDoDatabaseTest {
     }
 
     @Test
+    public void testInsertToDoWithID() throws Exception {
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+        String todoText = "UnitTest-ToDo";
+
+        // adding a call to insertUser, so we have a user to add todos for
+        String username = "unittester@tiy.com";
+        String fullName = "Unit Tester";
+        int userID = todoDatabase.insertUser(conn, username, fullName);
+
+        todoDatabase.insertToDoWithUserID(conn, todoText, userID);
+
+        // make sure we can retrieve the todo we just created
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM todos where text = ?");
+        stmt.setString(1, todoText);
+        ResultSet results = stmt.executeQuery();
+        assertNotNull(results);
+        // count the records in results to make sure we get what we expected
+        int numResults = 0;
+        while (results.next()) {
+            numResults++;
+        }
+
+        assertEquals(1, numResults);
+
+        todoDatabase.deleteToDo(conn, todoText);
+        // make sure we remove the test user we added earlier
+        todoDatabase.deleteUser(conn, username);
+
+        // make sure there are no more records for our test todo
+        results = stmt.executeQuery();
+        numResults = 0;
+        while (results.next()) {
+            numResults++;
+        }
+        assertEquals(0, numResults);
+    }
+
+
+    @Test
     public void testSelectAllToDos() throws Exception {
 
         Connection conn = DriverManager.getConnection("jdbc:h2:./main");
@@ -101,6 +142,74 @@ public class ToDoDatabaseTest {
 
         todoDatabase.deleteToDo(conn, firstToDoText);
         todoDatabase.deleteToDo(conn, secondToDoText);
+    }
+
+    @Test
+    public void testInsertToDoForUser() throws Exception {
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+        String todoText = "UnitTest-ToDo";
+        String todoText2 = "UnitTest-ToDo2";
+
+        // adding a call to insertUser, so we have a user to add todos for
+        String username = "unittester@tiy.com";
+        String fullName = "Unit Tester";
+        int userID = todoDatabase.insertUser(conn, username, fullName);
+
+        String username2 = "unitester2@tiy.com";
+        String fullName2 = "Unit Tester 2";
+        int userID2 = todoDatabase.insertUser(conn, username2, fullName2);
+
+        todoDatabase.insertToDoWithUserID(conn, todoText, userID);
+        todoDatabase.insertToDoWithUserID(conn, todoText2, userID2);
+
+        // make sure each user only has one todo item
+        ArrayList<ToDoItem> todosUser1 = todoDatabase.selectToDosForUser(conn, userID);
+        ArrayList<ToDoItem> todosUser2 = todoDatabase.selectToDosForUser(conn, userID2);
+
+        assertEquals(1, todosUser1.size());
+        assertEquals(1, todosUser2.size());
+
+        // make sure each todo item matches
+        ToDoItem todoUser1 = todosUser1.get(0);
+        assertEquals(todoText, todoUser1.text);
+        ToDoItem todoUser2 = todosUser2.get(0);
+        assertEquals(todoText2, todoUser2.text);
+
+        todoDatabase.deleteToDo(conn, todoText);
+        todoDatabase.deleteToDo(conn, todoText2);
+        // make sure we remove the test user we added earlier
+        todoDatabase.deleteUser(conn, username);
+        todoDatabase.deleteUser(conn, username2);
+
+    }
+
+    @Test
+    public void testSelectUser() throws Exception {
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+
+        // adding a call to insertUser, so we have a user to add todos for
+        String username = "unittester@tiy.com";
+        String fullName = "Unit Tester";
+        int userID = todoDatabase.insertUser(conn, username, fullName);
+
+        User returnedUser = todoDatabase.selectUser(conn, username);
+
+        System.out.println(returnedUser);
+        assertEquals(userID, returnedUser.id); // first assert
+
+
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE username = ?");
+        stmt.setString(1, username);
+        ResultSet results = stmt.executeQuery();
+        results.next();
+        String returnedUsername = results.getString("username");
+        assertEquals(username, returnedUsername); // second assert
+
+
+        results = stmt.executeQuery();
+        results.next();
+        String returnedFullname = results.getString("fullname");
+        assertEquals(fullName, returnedFullname); // third assert
     }
 
     @Test
@@ -175,5 +284,32 @@ public class ToDoDatabaseTest {
         // 8. cleanup
         todoDatabase.deleteToDo(conn, firstToDoText);
         todoDatabase.deleteToDo(conn, secondToDoText);
+    }
+
+    @Test
+    public void testInsertUser() throws Exception {
+
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+        String todoUser = "UnitTest-Username-thomas@tsl.com";
+        String todoUserfName = "UnitTest-User-Thomas Jackson";
+        int returnedID = todoDatabase.insertUser(conn, todoUser, todoUserfName);
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE username = ?");
+        stmt.setString(1, todoUser);
+        ResultSet results = stmt.executeQuery();
+        assertNotNull(results);
+        int numResults = 0;
+        while (results.next()) {
+            numResults++;
+            int userID = results.getInt("id");
+            String username = results.getString("username");
+            String userFullname = results.getString("fullname");
+            System.out.println(userID + "::" + username + "=>" + userFullname);
+        }
+        assertEquals(1, numResults);
+
+        results = stmt.executeQuery(); // results doesnt point to anything
+        results.next(); // so this is next
+        int userID = results.getInt("id");
+        assertEquals(returnedID, userID);
     }
 }
