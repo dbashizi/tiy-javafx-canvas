@@ -4,12 +4,14 @@ import org.h2.tools.Server;
 
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Created by danarchy on 5/12/16.
  */
 public class ToDoDatabase {
 
+    public ArrayList<User> masterUserList = new ArrayList<>();
     public int userID;
 
     public final static String DB_URL = "jdbc:h2:./main";

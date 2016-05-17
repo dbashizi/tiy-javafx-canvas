@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import jodd.json.JsonParser;
 import jodd.json.JsonSerializer;
 
+import javax.xml.transform.Result;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -50,20 +51,47 @@ public class Controller implements Initializable {
 //                todoItems.add(item);
 //            }
 //        }
-
         try {
             Connection conn;
             conn = DriverManager.getConnection("jdbc:h2:./main");
             toDoDatabase.init();
-
+            //Login Code Goes Here
+            login(conn);
+            //Login code Ends and Sets Our List
             System.out.println("Checking existing list ...");
-            ArrayList<ToDoItem> todos = toDoDatabase.selectToDos(conn);
+            ArrayList<ToDoItem> todos = toDoDatabase.selectToDosForUser(conn);
             for (ToDoItem item : todos) {
                 todoItems.add(item);
             }
             todoList.setItems(todoItems);
         } catch (SQLException e) {
 
+        }
+    }
+
+    public void login(Connection connec) throws SQLException {
+        System.out.println("Please enter your username: ");
+        System.out.print(">");
+        Scanner linescanner = new Scanner(System.in);
+        String currentUserName = linescanner.nextLine();
+
+        PreparedStatement logstatement = connec.prepareStatement("SELECT * FROM users WHERE username = ?");
+        logstatement.setString(1, currentUserName);
+        ResultSet results = logstatement.executeQuery();
+        boolean userExists = results.next();
+        if (userExists){
+            toDoDatabase.userID = results.getInt("id");
+            System.out.println(results.getInt("id"));
+        } else {
+            System.out.println("Please enter your full name: ");
+            System.out.print(">");
+            String fullName = linescanner.nextLine();
+            toDoDatabase.insertUser(connec, currentUserName, fullName);
+            PreparedStatement logstatement2 = connec.prepareStatement("SELECT * FROM users WHERE username = ?");
+            logstatement2.setString(1, currentUserName);
+            results = logstatement2.executeQuery();
+            results.next();
+            System.out.println(results.getInt("id"));
         }
     }
 

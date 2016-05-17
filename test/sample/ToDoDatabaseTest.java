@@ -191,4 +191,9 @@ public class ToDoDatabaseTest {
         boolean results = stmt2.execute();
         assertFalse(results);
     }
+
+    @Test
+    public void testLogin() throws Exception {
+
+    }
 }
