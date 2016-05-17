@@ -37,6 +37,8 @@ public class Controller implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
 
+        newQuestions();
+
 //        System.out.print("Please enter your name: ");
 //        Scanner inputScanner = new Scanner(System.in);
 //        username = inputScanner.nextLine();
@@ -84,7 +86,7 @@ public class Controller implements Initializable {
         try {
         System.out.println("Adding item ...");
         Connection conn =  DriverManager.getConnection("jdbc:h2:./main");
-        toDoDatabase.insertToDo(conn, todoText.getText());
+        toDoDatabase.insertToDo(conn, todoText.getText(), 0);
         todoItems.add(new ToDoItem(todoText.getText()));
         todoText.setText("");
 
@@ -105,16 +107,19 @@ public class Controller implements Initializable {
     public void toggleItem() {
         System.out.println("Toggling item ...");
         ToDoItem todoItem = (ToDoItem)todoList.getSelectionModel().getSelectedItem();
+
         try {
+            Connection conn = DriverManager.getConnection("jdbc:h2:./main");
             if (todoItem != null) {
                 todoItem.isDone = !todoItem.isDone;
                 todoList.setItems(null);
                 todoList.setItems(todoItems);
 
-                Connection conn = DriverManager.getConnection("jdbc:h2:./main");
-                toDoDatabase.toggleToDo(conn, todoItem.id);
 
+                toDoDatabase.toggleToDo(conn, todoItem.id);
             }
+            todoList.getSelectionModel().getSelectedItem();
+
         } catch (SQLException exception) {
 
         }
@@ -173,5 +178,19 @@ public class Controller implements Initializable {
 
         }
     }
-    
+
+    public void newQuestions() {
+        System.out.println("Create and Account or Log in...");
+        System.out.println("================================");
+        System.out.println("[1] - Login");
+        System.out.println("[1] - Create Account");
+
+        Scanner answer = new Scanner(System.in);
+        String userAnswer = answer.nextLine();
+
+        if (userAnswer.equals("1")) {
+            toDoDatabase.insertUser(conn, );
+        }
+    }
+
 }
